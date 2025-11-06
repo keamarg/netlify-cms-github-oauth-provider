@@ -1,23 +1,39 @@
-// callback.js
+// callback.js — works with both simple-oauth2 APIs
 module.exports =
-  (oauth2, providerName = "github") =>
+  (oauth2, providerName = "github", opts = {}) =>
   async (req, res) => {
     const code = req.query.code;
     if (!code) return res.status(400).send("Missing ?code");
 
+    const redirectUri = process.env.REDIRECT_URL;
+
     try {
-      const tokenParams = {
-        code,
-        redirect_uri: process.env.REDIRECT_URL,
-      };
+      let access,
+        tokenType = "bearer",
+        scope = "";
 
-      // v5: returns { token, ... }
-      const result = await oauth2.getToken(tokenParams);
-      const token = result.token;
-
-      const access = token.access_token;
-      const tokenType = token.token_type || "bearer";
-      const scope = token.scope || "";
+      if (opts.HasAuthCodeClass && typeof oauth2.getToken === "function") {
+        // v4/v5
+        const result = await oauth2.getToken({
+          code,
+          redirect_uri: redirectUri,
+        });
+        const token = result.token || result;
+        access = token.access_token;
+        tokenType = token.token_type || tokenType;
+        scope = token.scope || scope;
+      } else {
+        // v1–v3
+        const result = await oauth2.authorizationCode.getToken({
+          code,
+          redirect_uri: redirectUri,
+        });
+        const created = oauth2.accessToken.create(result);
+        const token = created.token || created;
+        access = token.access_token;
+        tokenType = token.token_type || tokenType;
+        scope = token.scope || scope;
+      }
 
       const hash =
         "#access_token=" +
