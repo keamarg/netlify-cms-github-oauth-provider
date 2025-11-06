@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "functions": {
+    "api/**/*.js": { "runtime": "nodejs18.x" },
+    "*.js": { "runtime": "nodejs18.x" }
+  },
+  "routes": [
+    { "src": "^/callback$", "dest": "/index.js" },
+    { "src": "^/callback$", "dest": "/server.js" },
+    { "src": "^/callback$", "dest": "/api/callback.js" }
+  ]
+}
