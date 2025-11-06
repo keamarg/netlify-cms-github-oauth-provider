@@ -5,6 +5,7 @@
     { "src": "^/$", "dest": "api/index.js" },
     { "src": "^/auth$", "dest": "api/auth.js" },
     { "src": "^/callback$", "dest": "api/callback.js" },
-    { "src": "^/success$", "dest": "api/success.js" }
+    { "src": "^/success$", "dest": "api/success.js" },
+    { "src": "^/debug-env$", "dest": "api/debug-env.js" }
   ]
 }
