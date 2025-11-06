@@ -1,14 +1,17 @@
-const simpleOauthModule = require("simple-oauth2");
+// index.js
+const { AuthorizationCode } = require("simple-oauth2");
 const authMiddleWareInit = require("./auth.js");
 const callbackMiddleWareInit = require("./callback");
+
 const oauthProvider = process.env.OAUTH_PROVIDER || "github";
 
-const oauth2 = simpleOauthModule.create({
+const oauth2 = new AuthorizationCode({
   client: {
     id: process.env.OAUTH_CLIENT_ID,
     secret: process.env.OAUTH_CLIENT_SECRET,
   },
   auth: {
+    // For GitHub (or GH Enterprise via GIT_HOSTNAME)
     tokenHost: process.env.GIT_HOSTNAME || "https://github.com",
     tokenPath: process.env.OAUTH_TOKEN_PATH || "/login/oauth/access_token",
     authorizePath: process.env.OAUTH_AUTHORIZE_PATH || "/login/oauth/authorize",
@@ -24,7 +27,7 @@ function indexMiddleWare(req, res) {
 
 module.exports = {
   auth: authMiddleWareInit(oauth2),
-  callback: callbackMiddleWareInit(oauth2, oauthProvider), // <-- pass providerName here
-  success: require("./success"), // your postMessage page
+  callback: callbackMiddleWareInit(oauth2, oauthProvider),
+  success: require("./success"),
   index: indexMiddleWare,
 };
